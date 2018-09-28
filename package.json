@@ -1,0 +1,17 @@
+{
+  "name": "codeship-node-v2",
+  "version": "0.0.0",
+  "description": "Codeship API v2 for Node",
+  "main": "index.js",
+  "scripts": {
+    "test": "./node_modules/.bin/standard"
+  },
+  "author": "Trolleymusic",
+  "license": "ISC",
+  "dependencies": {
+    "node-fetch": "^2.2.0"
+  },
+  "devDependencies": {
+    "standard": "^12.0.1"
+  }
+}
