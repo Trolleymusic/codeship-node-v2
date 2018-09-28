@@ -1,6 +1,6 @@
 {
   "name": "codeship-node-v2",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "Codeship API v2 for Node",
   "main": "index.js",
   "scripts": {
