@@ -19,7 +19,7 @@ class CodeshipNode {
         .then(() => this.getBuild(uuid)),
       list: (projectUuid) => this.checkAuth()
         .then(() => this.listBuilds(projectUuid)),
-      restart: (uuid, projectUuid) => this.checkAuth
+      restart: (uuid, projectUuid) => this.checkAuth()
         .then(() => this.restartBuild(uuid, projectUuid))
     }
 
@@ -95,6 +95,7 @@ class CodeshipNode {
 
   listBuilds (projectUuid) {
     const { orgUuid } = this
+    this.last.projectUuid = projectUuid
     const url = `/organizations/${orgUuid}/projects/${projectUuid}/builds`
     return this.request({ url })
       .then(({ builds }) => (builds))
@@ -111,7 +112,8 @@ class CodeshipNode {
     const { orgUuid } = this
     this.last.buildUuid = uuid
     const url = `/organizations/${orgUuid}/projects/${projectUuid}/builds/${uuid}/restart`
-    return this.request({ url })
+    const method = 'POST'
+    return this.request({ url, method })
   }
 
   request ({ method = 'GET', url }) {
@@ -129,7 +131,7 @@ class CodeshipNode {
     }
 
     return fetch(fullUrl, { headers, method })
-      .then(response => response.json())
+      .then(response => (response.status === 202 ? null : response.json()))
       .catch(error => {
         console.error(`Error making request to ${fullUrl}`, error)
         return Promise.reject(error)
