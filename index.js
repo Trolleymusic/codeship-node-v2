@@ -67,7 +67,7 @@ class CodeshipNode {
 
   saveOrganisation ({ organizations = [] }) {
     const { orgUuid, orgName } = this
-    const organisation = organizations.find(({ uuuuid, name }) => (uuuuid === orgUuid || name === orgName))
+    const organisation = organizations.find(({ uuid, name }) => (uuid === orgUuid || name === orgName))
     this.orgUuid = organisation.uuid
     this.orgName = organisation.name
   }
