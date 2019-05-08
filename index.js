@@ -94,7 +94,6 @@ class CodeshipNode {
   }
 
   listBuilds (projectUuid, { perPage = 30, page = 1 } = {}) {
-    console.log('listBuilds', page)
     const { orgUuid } = this
     this.last.projectUuid = projectUuid
     const query = { per_page: perPage, page }
