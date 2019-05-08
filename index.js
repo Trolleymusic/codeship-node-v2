@@ -93,12 +93,24 @@ class CodeshipNode {
       .then(({ project }) => (project))
   }
 
-  listBuilds (projectUuid) {
+  listBuilds (projectUuid, { perPage = 30, page = 1 } = {}) {
+    console.log('listBuilds', page)
     const { orgUuid } = this
     this.last.projectUuid = projectUuid
+    const query = { per_page: perPage, page }
     const url = `/organizations/${orgUuid}/projects/${projectUuid}/builds`
-    return this.request({ url })
-      .then(({ builds }) => (builds))
+
+    return this.request({ url, query })
+      .then((response) => {
+        const { builds, page, per_page: perPage } = response
+        if (!this.hasMore(response)) {
+          return builds
+        }
+
+        return this.listBuilds(projectUuid, { page: page + 1, perPage })
+          .then((moreBuilds) => [...builds, ...moreBuilds])
+      })
+      .then((builds) => (builds))
   }
 
   listProjects () {
@@ -116,7 +128,20 @@ class CodeshipNode {
     return this.request({ url, method })
   }
 
-  request ({ method = 'GET', url }) {
+  hasMore ({ page, per_page: perPage, total }) {
+    const totalPages = Math.ceil(total / perPage)
+    return page < totalPages
+  }
+
+  formatQuery ({ query }) {
+    const formattedQuery = Object.keys(query).map(key => {
+      const value = encodeURIComponent(query[key])
+      return `${key}=${value}`
+    })
+    return `?${formattedQuery.join('&')}`
+  }
+
+  request ({ method = 'GET', url, query }) {
     // Check auth
     if (!this.token) {
       return this.auth()
@@ -124,8 +149,13 @@ class CodeshipNode {
     }
 
     const { token } = this
+    let fullUrl = `${apiRoot}${url}`
 
-    const fullUrl = `${apiRoot}${url}`
+    if (query) {
+      const formattedQuery = this.formatQuery({ query })
+      fullUrl = `${fullUrl}?${formattedQuery}`
+    }
+
     const headers = {
       'Authorization': `Bearer ${token}`
     }
